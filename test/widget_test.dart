@@ -3,6 +3,7 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:test_app/data/database/database_helper.dart';
 import 'package:test_app/data/datasources/remote/websocket_mock.dart';
 import 'package:test_app/data/repositories/chat_repository_impl.dart';
+import 'package:test_app/data/repositories/auth_repository_impl.dart'; // Import the correct AuthRepository implementation
 import 'package:test_app/main.dart';
 
 void main() {
@@ -11,14 +12,19 @@ void main() {
     final MockWebSocketService webSocketService = MockWebSocketService();
     final DatabaseHelper databaseHelper = DatabaseHelper();
 
-    // Initialize the repository
+    // Initialize the repositories
+    final authRepository = AuthRepositoryImpl(databaseHelper: databaseHelper);
     final chatRepository = ChatRepositoryImpl(
       webSocketService: webSocketService,
       databaseHelper: databaseHelper,
     );
 
     // Build our app and trigger a frame.
-    await tester.pumpWidget(MyApp(chatRepository: chatRepository));
+    await tester.pumpWidget(MyApp(
+      authRepository: authRepository,
+      chatRepository: chatRepository,
+      databaseHelper: databaseHelper,
+    ));
 
     // Verify that the Chat page is displayed
     expect(find.text('Chat'), findsOneWidget);
